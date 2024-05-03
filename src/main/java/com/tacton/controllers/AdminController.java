@@ -18,6 +18,7 @@
 
 package com.tacton.controllers;
 
+import com.tacton.entities.Role;
 import com.tacton.entities.User;
 import com.tacton.entities.cpqresponse.*;
 import com.tacton.services.UserService;
@@ -25,6 +26,7 @@ import com.tacton.services.cpq.AccountService;
 import com.tacton.services.cpq.CartService;
 import com.tacton.services.cpq.CountryService;
 import com.tacton.services.cpq.CurrencyService;
+import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
@@ -130,7 +132,11 @@ public class AdminController {
     }
 
     public static boolean isAdmin(User user) {
-        return user.getUserRoles().stream().anyMatch(userRole -> userRole.getRole().getName().equals("ROLE_ADMIN"));
+        boolean currentUser;
+        currentUser = user.getUserRoles().stream().anyMatch(userRole -> userRole.getRole().getName().equals("ROLE_ADMIN"));
+        System.out.println(currentUser);
+
+        return currentUser;
     }
 
     @RequestMapping(path = "/admin/user/update", method = RequestMethod.POST)

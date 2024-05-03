@@ -3,40 +3,22 @@
 Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
 Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
 -->
-<html>
-    <head>
-        <title>TEST</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-        <script>
-            const apiKey = 'dVeAIWh13m5Gq';
-            const apiUrl = 'https://p4fbd076-edu.earlyaccess.tactoncpq.com/!tickets~T-00000001/self-service-api-v1.2/config/start/';
+<html xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="common/header :: common-header(${'Products'})"></head>
+    <body class="d-flex flex-column">
+        <div th:replace="common/navbar :: common-navbar"></div>
+        
+        <div th:each="steps : ${selfService}">
+            <span>Hola mundo</span>
+            
+        </div>
+        
+        <div th:replace="common/footer :: footer"></div>
 
-            const requestOptions = {
-              method: 'POST',
-              headers: {
-                'Authorization': 'Bearer ${apiKey}',
-                'catalog':'69107fe0-5200-4564-b409-8d1d82f11f66',
-                'productId':'m90737cadc8840d8852135424100a3e8'
-              }
-            };
+        <div th:replace="common/footer :: scripts"></div>
 
-            fetch(apiUrl, requestOptions)
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                }
-                return response.json();
-              })
-              .then(data => {
-                outputElement.textContent = JSON.stringify(data, null, 2);
-              })
-              .catch(error => {
-                console.error('Error:', error);
-              });
-        </script>
+        <div th:replace="common/footer :: shoppingCartDropdownWidget"></div>
+        
+    <script th:src="@{/js/tactonselfservice.js}"></script>
     </body>
 </html>

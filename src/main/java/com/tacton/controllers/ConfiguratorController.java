@@ -24,6 +24,7 @@ import com.tacton.services.NeedsParam;
 import com.tacton.services.cpq.CartService;
 import com.tacton.services.cpq.CountryService;
 import com.tacton.services.cpq.CurrencyService;
+import com.tacton.services.cpq.SelfServiceProductConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.client.RestClientException;
 
 
 @Controller

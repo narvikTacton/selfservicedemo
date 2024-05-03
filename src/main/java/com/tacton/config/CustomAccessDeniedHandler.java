@@ -30,8 +30,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
-
-        response.sendRedirect("/accessDenied");
+        System.out.println("error cause access denied: "+e.getCause());
+        //response.sendRedirect("/accessDenied"); commented because calling function doesn't exist
 
     }
 }

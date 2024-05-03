@@ -52,21 +52,27 @@ public class UserSecurityService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         LOGGER.info("authenticating");
+        LOGGER.info("username received: "+username);
 
-        User user = userRepository.findByUsername(username);
-        if (null == user) {
+        User user = userRepository.findByUsername(username); //function findByUsername doesn't exist in CRUD jar
+        LOGGER.info("user info: ",user.getUsername());
+        if (user == null) {
             throw new UsernameNotFoundException("Username " + username + " not found");
+        }else{
+            LOGGER.info("user found");
         }
 
         if (user.isEnabled()==true && !AdminController.isAdmin(user)) {
+            LOGGER.info("entered if");
             try {
                 userService.setActiveCartOrCreateOne(user);
+                LOGGER.info("entered try");
             } catch (CartCreateException ex) {
                 LOGGER.warn("Cannot create cart, wrong account.", ex);
                 throw new WrongAccountException(ex.getMessage());
             }
         }
-
+        LOGGER.info("user info end function: ",user);
         return user;
     }
 }

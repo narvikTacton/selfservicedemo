@@ -19,7 +19,6 @@
             <ul class="nav nav-tabs">
                 <li class="nav-item" th:each="catalog : ${catalogTabsList}">
                     <a class="nav-link" th:href="@{'/shop/' + ${catalog.name}}" th:text="${catalog.title}" th:classappend="${currentCatalog.name==catalog.name}? 'active'"></a>
-                    <span th:text="${catalog.name}">Catalog ID</span><br>
                 </li>
             </ul>
 
@@ -27,13 +26,14 @@
             <div class="tab-pane">
 
                 <div th:each="product : ${products}">
-                    <span th:text="${product}"></span><br>
+                    <!--<span th:text="${product}"></span><br>-->
                     <div class="row shop-product">
                         <div class="col-3">
                             <img th:if="${product.image!=null}" th:src="@{'data:image/png;base64,'+${product.img}}" ></img>
                         </div>
                         <div class="col">
                             <h3><span th:text="${product.name}"></span> <span class="product-id" th:text="${product.productId}"></span></h3>
+                            <span th:text="${product.description}"></span>
                             <p th:if="${!currentCatalog.isConfigurable}">Price: <strong><span th:text="${product.price}"></span> <span th:text="${product.currency}"></span></strong></p>
 
                             <div class="row float-right">
@@ -54,13 +54,16 @@
                                           </span>
                                         </div>
                                     </div>
+
                                     <div th:if="${!#authorization.expression('hasRole(''ROLE_ADMIN'')')}" class="d-inline-block shop-actions">
-                                        <a th:if="${currentCatalog.isConfigurable}" th:href="@{'/configure/' + ${currentCatalog.name} + '/'+ ${product.id}}" class="btn shop-configure-btn">Configure</a> <!--original line-->
+                                        <a th:if="${currentCatalog.isConfigurable}" th:href="@{'/config/start/' + ${currentCatalog.name} + '/'+ ${product.id}}" class="btn shop-configure-btn">Configure</a>
+                                        <!--<a th:if="${currentCatalog.isConfigurable}" th:href="@{'/configure/' + ${currentCatalog.name} + '/'+ ${product.id}}" class="btn shop-configure-btn">Configure</a> <!--original line-->
                                         <!--<a th:if="${currentCatalog.isConfigurable}" th:href="@{'/configure'}" class="btn shop-configure-btn">Configure</a><!--To make it work-->
                                         <a th:if="${!currentCatalog.isConfigurable}" class="btn shop-add-btn" th:data-product="${product.id}" th:data-field="'quant['+${product.id}+']'">Add to cart</a>
                                     </div>
                                     <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" class="d-inline-block shop-actions">
-                                        <a th:if="${currentCatalog.isConfigurable}" th:href="@{'/configure/'}" class="btn shop-configure-btn ">Configure</a>
+                                        <a th:if="${currentCatalog.isConfigurable}" th:href="@{'/customize/' + ${currentCatalog.name} + '/'+ ${product.id}}" class="btn shop-configure-btn" >Customize</a>
+                                        <!--<a th:if="${currentCatalog.isConfigurable}" th:href="@{'/configure/'}" class="btn shop-configure-btn ">Configure</a>-->
                                         <a id="addToCartLink" th:if="${!currentCatalog.isConfigurable}" class="btn shop-add-btn " th:data-product="${product.id}" th:data-field="'quant['+${product.id}+']'">Add to cart</a>
                                     </div>
 

@@ -21,6 +21,7 @@ package com.tacton.controllers;
 import com.tacton.entities.User;
 import com.tacton.entities.cpqresponse.*;
 import com.tacton.services.cpq.CartService;
+import com.tacton.services.cpq.SelfServiceProductConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public class ShopController {
 
     @RequestMapping("/shop")
     public String getShopHomepage(Model model) throws Exception{
-
+        
         RestTemplate restTemplate = new RestTemplate();
         Catalog[] catalogues = restTemplate.getForObject(customer_self_service_api_url + CATALOG_TABS_URI + API_KEY_PARAM, Catalog[].class, customer_self_service_api_key);
         
@@ -220,6 +221,36 @@ public class ShopController {
         }catch(NumberFormatException | RestClientException e){System.out.println(e);}
         return "redirect:"+referer;
     }
+    
+    //Self Service customize product not using viz
+    @RequestMapping(path = "/customize/{catalog}/{product}")
+    public String selfServiceConfig(@PathVariable String catalog, @PathVariable String product, @RequestHeader(value = "referer", required = false) String referer, Model model, HttpSession session){
+        LOGGER.info("entered CSS customize");
+        //SelfServiceProductConfigService selfService = null;
+        try{            
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            //selfService.getSelfService(catalog,product);
+            RestTemplate restTemplate = new RestTemplate();
+            String url = customer_self_service_api_url + "/config/start/"+catalog+product+"&_key="+API_KEY_PARAM;
+            HttpHeaders requestHeaders = new HttpHeaders();
+            requestHeaders.add("X-Key", customer_self_service_api_key);
+            HttpEntity<String> request = new HttpEntity<>(requestHeaders);
+
+            LOGGER.debug("config start url=" + url);
+
+            restTemplate.exchange(url, HttpMethod.POST, request, Resource.class);
+            
+            
+            //Auth user
+            Authentication auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        
+        }catch (RestClientException e) {
+      System.out.println(e);
+    }
+            return "customize";
+
+}
 
 
 }
