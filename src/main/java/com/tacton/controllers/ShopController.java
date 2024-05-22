@@ -18,10 +18,14 @@
 
 package com.tacton.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tacton.entities.User;
 import com.tacton.entities.cpqresponse.*;
+import com.tacton.services.UserService;
 import com.tacton.services.cpq.CartService;
 import com.tacton.services.cpq.SelfServiceProductConfigService;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +50,12 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.client.RestClientException;
+import top.jfunc.json.impl.JSONObject;
+import com.fasterxml.jackson.core.JsonParser;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 @Controller
 public class ShopController {
@@ -77,6 +86,9 @@ public class ShopController {
 
     @Autowired
     CartService cartService;
+    
+    @Autowired
+    private UserService userService;
 
 
     @RequestMapping("/shop")
@@ -97,6 +109,7 @@ public class ShopController {
 
         ProductList productList = restTemplate.getForObject(customer_self_service_api_url + "/catalog/search/" + currentCatalog.getName()  + API_KEY_PARAM + LIMIT_PARAM,
                 ProductList.class, customer_self_service_api_key, catalogLimit);
+        
         for (Product p : productList.getProducts()){
             if(p.getImage()!=null && !p.getImage().isEmpty()) {
                 //Call to get image file
@@ -115,7 +128,7 @@ public class ShopController {
                 p.setImg(Base64.getEncoder().encodeToString(buffer));
             }
         }
-
+       
         model.addAttribute("products", productList.getProducts());
 
         return "shop";
@@ -165,7 +178,8 @@ public class ShopController {
             }
         }
 
-        model.addAttribute("products", productList.getProducts());}catch(Exception e2){}
+        model.addAttribute("products", productList.getProducts());
+        }catch(Exception e2){}
 
         return "shop";
     }
@@ -223,34 +237,112 @@ public class ShopController {
     }
     
     //Self Service customize product not using viz
-    @RequestMapping(path = "/customize/{catalog}/{product}")
-    public String selfServiceConfig(@PathVariable String catalog, @PathVariable String product, @RequestHeader(value = "referer", required = false) String referer, Model model, HttpSession session){
-        LOGGER.info("entered CSS customize");
-        //SelfServiceProductConfigService selfService = null;
+    @RequestMapping("/customize/{catalog}/{product}")
+    public String selfServiceConfig(@PathVariable String catalog, @PathVariable String product, Model model,HttpServletRequest request) throws IOException{
+        
+        SelfServiceProductConfigService cssApiCallService=new SelfServiceProductConfigService();
+        //SelfServiceProductConfigService objResponse = new SelfServiceProductConfigService();
+        //List<SelfServiceProductConfigJSON> JSONresponse;
+        
+        String url = customer_self_service_api_url + "/config/start/"+catalog+"/"+product+API_KEY_PARAM;
+        LOGGER.info("CSS api call: "+url);
         try{            
+            //User userFromAuthentication = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            //User user = userService.findById(userFromAuthentication.getId());
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            //selfService.getSelfService(catalog,product);
-            RestTemplate restTemplate = new RestTemplate();
-            String url = customer_self_service_api_url + "/config/start/"+catalog+product+"&_key="+API_KEY_PARAM;
-            HttpHeaders requestHeaders = new HttpHeaders();
-            requestHeaders.add("X-Key", customer_self_service_api_key);
-            HttpEntity<String> request = new HttpEntity<>(requestHeaders);
-
-            LOGGER.debug("config start url=" + url);
-
-            restTemplate.exchange(url, HttpMethod.POST, request, Resource.class);
             
             
-            //Auth user
+            cssApiCallService.getProductConfigSelfService(catalog, product);
+            LOGGER.info("Service Response in controller"+cssApiCallService.getProductConfigSelfService(catalog, product));
             Authentication auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
-        
+            
         }catch (RestClientException e) {
-      System.out.println(e);
-    }
+            System.out.println("customize.html error: "+e);
+        }
+            //Object objCssApiCallService = cssApiCallService.getProductConfigSelfService(catalog, product);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode;
+            jsonNode=mapper.readTree(cssApiCallService.getProductConfigSelfService(catalog, product));
+            Iterator<JsonNode> nodes=jsonNode.elements();
+            //Create needs array from JSON to use in front-end
+            List<String> needs = new ArrayList<>();
+            String needName="";
+            //Create domain name array from JSON to use in front-end
+            List<String> needDomainNames = new ArrayList<>();
+            String needDomainName="";
+            //Create domain needs array from JSON and domain element list object to use in front-end                    
+            List<DomainElement> domainElements = new ArrayList<DomainElement>();
+            DomainElementList domainElementList = new DomainElementList();
+            
+            while(nodes.hasNext()){
+                JsonNode node = nodes.next();
+                JsonNode steps = node.get(0); 
+                if(steps!=null){
+                    //get steps description to put as label in front-end nav bar
+                    String strNeedsDescription = steps.findValue("description").asText();
+                    strNeedsDescription.replace("\"","");
+                    Object objNeedsDescription = strNeedsDescription;
+                    model.addAttribute("needsLabel", objNeedsDescription);
+                    //get rootGroup to access members of needs
+                    JsonNode rootGroupNode = steps.findValue("rootGroup");
+                    JsonNode rootGroupMembers = rootGroupNode.findValue("members");
+                    Iterator<JsonNode> membersNodes = rootGroupMembers.elements();
+                    while(membersNodes.hasNext()){
+                        JsonNode posMemberNode = membersNodes.next();
+                        JsonNode needsMembers = posMemberNode.get("members");
+                        if(needsMembers!=null){
+                            Iterator<JsonNode> needsNodes = needsMembers.elements();  
+                            while(needsNodes.hasNext()){
+                                JsonNode posNeedNode = needsNodes.next();
+                                boolean isParameter = posNeedNode.get("isParameter").asBoolean();                                
+                                if(isParameter){
+                                    needName = posNeedNode.get("description").asText();
+                                    //Get domains values for needs
+                                    JsonNode needsDomains = posNeedNode.get("domain");
+                                    //LOGGER.info("domain "+needsDomains);
+                                    needDomainName = posNeedNode.get("name").asText();
+                                    JsonNode domainElementsNode = needsDomains.get("elements");
+                                    //LOGGER.info("domain elements node"+domainElementsNode);
+                                    Iterator<JsonNode> domainElementsNodes = domainElementsNode.elements();                                    
+                                    while(domainElementsNodes.hasNext()){  
+                                        DomainElement domainElement = new DomainElement();
+                                        JsonNode posElementNode = domainElementsNodes.next();
+                                        domainElement.setNeedDescription(needName);
+                                        domainElement.setName(posElementNode.get("name").asText());
+                                        domainElement.setDescription(posElementNode.get("description").asText());
+                                        domainElement.setState(posElementNode.get("state").asText());
+                                        domainElement.setSelected(posElementNode.get("selected").asBoolean());
+                                        LOGGER.info("Domain element object: "+domainElement);
+                                        //Add domains elements needs to array list
+                                        domainElements.add(domainElement);
+                                    }
+                                    domainElementList.setDomainElements(domainElements);
+                                }                                
+                            }         
+                        }
+                        //Add needs to array list
+                        needs.add(needName);
+                        //Add need domain names to array list
+                        needDomainNames.add(needDomainName);
+                    }
+                }
+            }
+            LOGGER.info("needs list: "+needs);
+            LOGGER.info("need domain name list: "+needDomainNames);
+            LOGGER.info("Domain Element list "+domainElements);
+            LOGGER.info("domain list object "+domainElementList.getDomainElements());
+            //add model attributes to pass to the front-end
+            model.addAttribute("json",jsonNode);
+            model.addAttribute("needs",needs);
+            model.addAttribute("needDomainNames",needDomainNames);
+            model.addAttribute("domainElements",domainElementList.getDomainElements());
+            model.addAttribute("catalog",catalog);
+            model.addAttribute("product",product);
+            
+            
             return "customize";
-
-}
+    }
 
 
 }

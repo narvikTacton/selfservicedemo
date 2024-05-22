@@ -134,7 +134,7 @@ public class AdminController {
     public static boolean isAdmin(User user) {
         boolean currentUser;
         currentUser = user.getUserRoles().stream().anyMatch(userRole -> userRole.getRole().getName().equals("ROLE_ADMIN"));
-        System.out.println(currentUser);
+        System.out.println("user has role ROLE_ADMIN?:"+currentUser);
 
         return currentUser;
     }

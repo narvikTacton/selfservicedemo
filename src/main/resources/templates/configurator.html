@@ -45,7 +45,9 @@
 
         <div id="confcontainer" class="col-conf">
             <strong class="product-name">TECHNICAL REQUIREMENTS</strong>
-            <div id="configurator"></div>
+            <div id="configurator">
+                <span th:text="${jsonSizing}"></span>
+            </div>
         </div>
 
         <div class="col-summary">
@@ -325,7 +327,6 @@
 <script th:src="@{/js/selectric.js}"></script>
 <script th:src="@{/js/bootstrapslider.js}"></script>
 <script th:src="@{/js/tactonselfservice.js}"></script>
-<script th:src="https://p4fbd076-edu.earlyaccess.tactoncpq.com/!tickets~T-00000001/js/tacton.vis.js"></script>
 
 
 </body>

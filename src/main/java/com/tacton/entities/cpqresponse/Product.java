@@ -30,7 +30,6 @@ public class Product {
     private String description;
     private String image;
     private String type;
-
     private String img;
 
 
@@ -72,7 +71,6 @@ public class Product {
     public void setImage(String image) {
         this.image = image;
     }
-
 
 
     public String getType() {

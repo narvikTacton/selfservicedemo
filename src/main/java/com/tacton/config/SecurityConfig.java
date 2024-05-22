@@ -62,6 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/",
             "/configurator",
             "/configure",
+            "/customize/**",
             "/configure-needs/**",
             "/templates",
             "/vis/**",
@@ -79,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/login/**",
             "/logout",
             "/logout/**",
-            "/register",
+            "/register"
     };
 
     //only allowed for users with admin role

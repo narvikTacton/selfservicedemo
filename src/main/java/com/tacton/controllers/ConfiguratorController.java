@@ -242,6 +242,44 @@ public class ConfiguratorController {
 
         return "configuratorLeadgen";
     }
+    
+    //Customer SelfService
+    @RequestMapping("/customize/configure/{catalog}/{product}")
+    public String configureProductSelfService(@PathVariable String product, @PathVariable String catalog, Model model, HttpServletRequest request) throws Exception {
+        LOGGER.info("entered configureProduct WS");
+        String referer = request.getHeader("Referer");
+        
+        SelfServiceProductConfigService cssApiCallService=new SelfServiceProductConfigService();
+        String strCssApiCallService=cssApiCallService.getSizingSelfService();
+        Object objCssApiCallService = strCssApiCallService;
+        model.addAttribute("jsonSizing",objCssApiCallService);
+     
+
+        //User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        //String cart = user.getActiveCartId();
+
+        model.addAttribute("qty", 1);
+        model.addAttribute("customer_self_service_api_key", customer_self_service_api_key);
+        model.addAttribute("customer_self_service_api_url", customer_self_service_api_url);
+        model.addAttribute("products_images_from_outside", products_images_from_outside);
+        model.addAttribute("cpq_instance_url", cpq_instance_url);
+        model.addAttribute("product_name", product_name);
+        model.addAttribute("product_id", product);
+        model.addAttribute("catalogTab", catalog);
+        //model.addAttribute("activeCartId", cart);
+        model.addAttribute("referer", referer);
+        //model.addAttribute("is_visualization_supported", is_visualization_supported);
+        //model.addAttribute("visualization_image", visualization_image);
+        //model.addAttribute("visualization_group_name", visualization_group_name);
+        model.addAttribute("summary_group_name", summary_group_name);
+        model.addAttribute("bom_columns", css_bom_columns);
+        model.addAttribute("bom_extra_info", css_bom_extra_info);
+        model.addAttribute("bom_show_prices", css_bom_show_prices);
+        model.addAttribute("needs_params", needsParam);
+        model.addAttribute("cpq_instance_url", cpq_instance_url);
+
+        return "configurator";
+    }
 
 
 }

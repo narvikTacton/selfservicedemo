@@ -25,13 +25,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
-        System.out.println("error cause access denied: "+e.getCause());
-        //response.sendRedirect("/accessDenied"); commented because calling function doesn't exist
+        System.out.println("error cause access denied: "+Arrays.toString(e.getStackTrace()));
+        response.sendRedirect("/accessDenied");
 
     }
 }

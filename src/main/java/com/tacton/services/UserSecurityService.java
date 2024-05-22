@@ -51,28 +51,29 @@ public class UserSecurityService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        LOGGER.info("authenticating");
         LOGGER.info("username received: "+username);
 
-        User user = userRepository.findByUsername(username); //function findByUsername doesn't exist in CRUD jar
-        LOGGER.info("user info: ",user.getUsername());
+        User user = userRepository.findByUsername(username); //function findByUsername doesn't exist in CRUD jar and odd behavior
         if (user == null) {
             throw new UsernameNotFoundException("Username " + username + " not found");
         }else{
-            LOGGER.info("user found");
+            LOGGER.info("user found: "+user);
+            return user;
         }
 
-        if (user.isEnabled()==true && !AdminController.isAdmin(user)) {
+        /*if (user.isEnabled()==true && !AdminController.isAdmin(user)) {
             LOGGER.info("entered if");
             try {
                 userService.setActiveCartOrCreateOne(user);
-                LOGGER.info("entered try");
+                LOGGER.info("setActiveCartOrCreateOne");
             } catch (CartCreateException ex) {
                 LOGGER.warn("Cannot create cart, wrong account.", ex);
                 throw new WrongAccountException(ex.getMessage());
             }
-        }
-        LOGGER.info("user info end function: ",user);
-        return user;
+        }else{
+            userDetails=user;
+        }*/
+        //LOGGER.info("user info end function: ",userDetails);
+        //return userDetails;
     }
 }

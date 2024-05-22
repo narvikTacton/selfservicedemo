@@ -15,7 +15,7 @@
     <description>Demo project</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>22</java.version>
     </properties>
 
     <dependencies>
@@ -103,8 +103,18 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-
-
+        <dependency>
+            <groupId>top.jfunc.json</groupId>
+            <artifactId>json-jackson</artifactId>
+            <version>1.8.3</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.goikosoft.utils</groupId>
+            <artifactId>jackson-utils</artifactId>
+            <version>0.1.1</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>

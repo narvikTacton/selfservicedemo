@@ -1,24 +1,77 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
 <html xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="common/header :: common-header(${'Products'})"></head>
-    <body class="d-flex flex-column">
-        <div th:replace="common/navbar :: common-navbar"></div>
-        
-        <div th:each="steps : ${selfService}">
-            <span>Hola mundo</span>
-            
+
+<head th:replace="common/header :: common-header(${'Json'})"></head>
+
+<body class="d-flex flex-column">
+
+
+<div th:replace="common/navbar :: common-navbar"></div>
+
+
+
+<div class="container flex-grow mb-5">
+
+    <div class="row mt-5 d-flex">
+
+        <div class="col">
+
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{'#'}" th:text="${needsLabel}"></a>
+                </li>
+            </ul>
+
+
+            <div class="tab-pane">
+                <div>
+                    <div class="row shop-product">
+                        <div class="container-fluid">
+                            <div th:each="need : ${needs}">
+                                <div class=class="row mt-5 d-flex">
+                                    <ol class="list-group">
+                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold" th:text="${need}"></div>
+                                                <div th:each="domainElement : ${domainElements}" class="form-check-inline">
+                                                    <div th:if="${need=='Usage'}" class="btn-group" data-toggle="buttons"><!--<!-- Do not change if -->
+                                                        <label th:if="${domainElement.needDescription=='Usage'}" class="btn btn-primary">
+                                                            <input type="radio" th:text="${domainElement.description}" name="options">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div th:if="${need=='Height of Rider'}" class="ms-2 me-auto">
+                                                    <label th:each="needDomainName : ${needDomainNames}">
+                                                        <input th:if="${needDomainName=='a677863d3a144ee8ba4d855acc54bb7c'}" min="100" max="250" type="number" class="form-control"/>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" class="d-inline-block shop-actions">                                        
+                    <a th:href="@{'/customize/configure/'+${catalog}+'/'+${product}}" class="btn shop-configure-btn" >Configure</a>
+                    <!--<a th:if="${currentCatalog.isConfigurable}" th:href="@{'#'}" class="btn shop-configure-btn ">Configure</a>-->
+                    <!--<a id="addToCartLink" th:if="${!currentCatalog.isConfigurable}" class="btn shop-add-btn " th:data-product="${product.id}" th:data-field="'quant['+${product.id}+']'">Add to cart</a>-->
+                </div>
+            </div>
         </div>
-        
-        <div th:replace="common/footer :: footer"></div>
+    </div>
 
-        <div th:replace="common/footer :: scripts"></div>
+</div>
 
-        <div th:replace="common/footer :: shoppingCartDropdownWidget"></div>
-        
-    <script th:src="@{/js/tactonselfservice.js}"></script>
-    </body>
+
+
+
+<div th:replace="common/footer :: footer"></div>
+
+<div th:replace="common/footer :: scripts"></div>
+
+<div th:replace="common/footer :: shoppingCartDropdownWidget"></div>
+
+</body>
 </html>
