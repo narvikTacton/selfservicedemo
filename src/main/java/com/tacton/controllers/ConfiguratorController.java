@@ -250,7 +250,7 @@ public class ConfiguratorController {
         String referer = request.getHeader("Referer");
         
         SelfServiceProductConfigService cssApiCallService=new SelfServiceProductConfigService();
-        String strCssApiCallService=cssApiCallService.getSizingSelfService();
+        String strCssApiCallService=cssApiCallService.getSizingSelfService(catalog, product);
         Object objCssApiCallService = strCssApiCallService;
         model.addAttribute("jsonSizing",objCssApiCallService);
      
